@@ -35,30 +35,7 @@ def get_agendamentos():
         return agendamentos_formatados
     except Exception as e:
         print("Erro ao buscar agendamentos:", e)
-        return []
-
-# Função para verificar se o horário está ocupado para uma sala específica
-def verificar_horario_ocupado(sala_id, data, hora_inicio, hora_fim):
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        cursor.execute('''
-            SELECT COUNT(*) FROM agendamentos 
-            WHERE sala_id = %s 
-            AND data = %s 
-            AND (
-                (hora_inicio < %s AND hora_fim > %s) OR  
-                (hora_inicio < %s AND hora_fim > %s) OR  
-                (hora_inicio >= %s AND hora_fim <= %s)   
-            )
-        ''', (sala_id, data, hora_inicio, hora_inicio, hora_fim, hora_fim, hora_inicio, hora_fim))
-        
-        resultado = cursor.fetchone()[0]
-        conn.close()
-        return resultado > 0
-    except Exception as e:
-        print("Erro ao verificar horário ocupado:", e)
-        return False
+        return None
 
 @app.route('/')
 def index():
@@ -100,12 +77,13 @@ def agendar():
 def listar_agendamentos():
     try:
         agendamentos = get_agendamentos()
-        if not agendamentos:
-            return jsonify({"error": "Nenhum agendamento encontrado ou erro na consulta."}), 500
+        if agendamentos is None:
+            raise Exception("Erro ao buscar agendamentos: conexão com o banco de dados falhou ou retornou None.")
+        
         return jsonify(agendamentos)
     except Exception as e:
         print("Erro na rota /agendamentos:", e)
-        return jsonify({"error": "Erro ao carregar agendamentos."}), 500
+        return jsonify({"error": "Erro ao carregar agendamentos. Tente novamente mais tarde."}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))

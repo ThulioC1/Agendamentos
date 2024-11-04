@@ -20,7 +20,15 @@ def get_agendamentos():
     agendamentos_formatados = []
     for agendamento in agendamentos:
         id, data, hora_inicio, hora_fim, descricao, participantes, sala_id, nome = agendamento
-        data_formatada = datetime.strptime(data, '%Y-%m-%d').strftime('%d/%m/%Y')
+        
+        # Verifica o tipo de data e converte para o formato PT-BR
+        if isinstance(data, datetime):
+            data_formatada = data.strftime('%d/%m/%Y')
+        elif isinstance(data, str):
+            data_formatada = datetime.strptime(data, '%Y-%m-%d').strftime('%d/%m/%Y')
+        else:
+            data_formatada = data  # Mantém como está se já estiver formatada
+
         agendamentos_formatados.append((id, data_formatada, hora_inicio, hora_fim, descricao, participantes, sala_id, nome))
     
     return agendamentos_formatados
@@ -88,7 +96,15 @@ def listar_agendamentos():
     agendamentos_formatados = []
     for agendamento in agendamentos:
         id, data, hora_inicio, hora_fim, descricao, participantes, sala_id, nome = agendamento
-        data_formatada = datetime.strptime(data, '%Y-%m-%d').strftime('%d/%m/%Y')
+        
+        # Verifica o tipo de data e converte para o formato PT-BR
+        if isinstance(data, datetime):
+            data_formatada = data.strftime('%d/%m/%Y')
+        elif isinstance(data, str):
+            data_formatada = datetime.strptime(data, '%Y-%m-%d').strftime('%d/%m/%Y')
+        else:
+            data_formatada = data
+
         agendamentos_formatados.append((id, data_formatada, hora_inicio, hora_fim, descricao, participantes, sala_id, nome))
     
     return jsonify(agendamentos_formatados)

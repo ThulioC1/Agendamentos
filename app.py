@@ -1,15 +1,23 @@
 from flask import Flask, render_template, request, jsonify
-import sqlite3
+import psycopg2
 import os
 from datetime import datetime
 
 app = Flask(__name__)
 
+# Insira aqui a sua connection string do Neon
+DATABASE_URL = "postgresql://neondb_owner:HGe8o6aKVprN@ep-dark-lake-a5hkjrso.us-east-2.aws.neon.tech/neondb?sslmode=require"
+
+def get_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
+
 def get_agendamentos():
-    conn = sqlite3.connect('agendamentos.db')
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM agendamentos')
     agendamentos = cursor.fetchall()
+    cursor.close()
     conn.close()
     
     # Formata as datas para PT-BR
@@ -31,20 +39,21 @@ def get_agendamentos():
 
 # Função para verificar se o horário está ocupado para uma sala específica
 def verificar_horario_ocupado(sala_id, data, hora_inicio, hora_fim):
-    conn = sqlite3.connect('agendamentos.db')
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute('''
         SELECT COUNT(*) FROM agendamentos 
-        WHERE sala_id = ? 
-        AND data = ? 
+        WHERE sala_id = %s 
+        AND data = %s 
         AND (
-            (hora_inicio < ? AND hora_fim > ?) OR  -- Horário de início está dentro do intervalo
-            (hora_inicio < ? AND hora_fim > ?) OR  -- Horário de fim está dentro do intervalo
-            (hora_inicio >= ? AND hora_fim <= ?)   -- Intervalo está totalmente dentro de um agendamento existente
+            (hora_inicio < %s AND hora_fim > %s) OR  -- Horário de início está dentro do intervalo
+            (hora_inicio < %s AND hora_fim > %s) OR  -- Horário de fim está dentro do intervalo
+            (hora_inicio >= %s AND hora_fim <= %s)   -- Intervalo está totalmente dentro de um agendamento existente
         )
     ''', (sala_id, data, hora_inicio, hora_inicio, hora_fim, hora_fim, hora_inicio, hora_fim))
     
     resultado = cursor.fetchone()[0]
+    cursor.close()
     conn.close()
     return resultado > 0
 
@@ -74,22 +83,24 @@ def agendar():
         return jsonify({"success": False, "message": "Horário já está ocupado para esta sala."})
     else:
         # Insere o novo agendamento
-        conn = sqlite3.connect('agendamentos.db')
+        conn = get_connection()
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO agendamentos (data, hora_inicio, hora_fim, descricao, participantes, sala_id, nome) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (data, hora_inicio, hora_fim, descricao, participantes, sala_id, nome))
         conn.commit()
+        cursor.close()
         conn.close()
         return jsonify({"success": True, "message": "Agendamento realizado com sucesso!"})
 
 @app.route('/agendamentos')
 def listar_agendamentos():
-    conn = sqlite3.connect('agendamentos.db')
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute('SELECT id, data, hora_inicio, hora_fim, descricao, participantes, sala_id, nome FROM agendamentos')
     agendamentos = cursor.fetchall()
+    cursor.close()
     conn.close()
 
     # Formata as datas para PT-BR
@@ -109,4 +120,3 @@ def listar_agendamentos():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))  # 5000 é a porta padrão para desenvolvimento
     app.run(host="0.0.0.0", port=port)
-    app.run(debug=True)

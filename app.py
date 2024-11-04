@@ -5,19 +5,12 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Insira aqui a sua connection string do Neon
-DATABASE_URL = "postgresql://neondb_owner:HGe8o6aKVprN@ep-dark-lake-a5hkjrso.us-east-2.aws.neon.tech/neondb?sslmode=require"
-
-def get_connection():
-    conn = psycopg2.connect(DATABASE_URL)
-    return conn
-
 def get_agendamentos():
-    conn = get_connection()
+    # Use a connection string fornecida pelo Neon
+    conn = psycopg2.connect(os.environ['postgresql://neondb_owner:HGe8o6aKVprN@ep-dark-lake-a5hkjrso.us-east-2.aws.neon.tech/neondb?sslmode=require'])  # Substitua pela sua conexão
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM agendamentos')
     agendamentos = cursor.fetchall()
-    cursor.close()
     conn.close()
     
     # Formata as datas para PT-BR
@@ -36,6 +29,7 @@ def get_agendamentos():
         agendamentos_formatados.append((id, data_formatada, hora_inicio, hora_fim, descricao, participantes, sala_id, nome))
     
     return agendamentos_formatados
+
 
 # Função para verificar se o horário está ocupado para uma sala específica
 def verificar_horario_ocupado(sala_id, data, hora_inicio, hora_fim):

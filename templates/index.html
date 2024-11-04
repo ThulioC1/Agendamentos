@@ -51,7 +51,7 @@
 
     <script>
     document.getElementById("form-agendamento").onsubmit = async function(event) {
-        event.preventDefault(); // Impede o envio padrão do formulário
+        event.preventDefault();
 
         const formData = new FormData(this);
         
@@ -64,12 +64,10 @@
             const result = await response.json();
 
             if (!result.success) {
-                // Mostra a mensagem de erro se o horário já estiver ocupado
                 alert(result.message);
             } else {
-                // Mensagem de sucesso
                 alert("Agendamento realizado com sucesso!");
-                carregarAgendamentos(); // Atualiza a tabela de agendamentos
+                carregarAgendamentos();
             }
         } catch (error) {
             console.error("Erro ao enviar o agendamento:", error);
@@ -80,10 +78,19 @@
     async function carregarAgendamentos() {
         try {
             const response = await fetch('/agendamentos');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
             const agendamentos = await response.json();
 
+            if (!Array.isArray(agendamentos)) {
+                throw new Error("Resposta inesperada do servidor");
+            }
+
             const tabela = document.getElementById("tabela-agendamentos");
-            tabela.innerHTML = ""; // Limpa a tabela antes de preencher
+            tabela.innerHTML = "";
 
             agendamentos.forEach(agendamento => {
                 const row = tabela.insertRow();
@@ -98,7 +105,7 @@
             });
         } catch (error) {
             console.error("Erro ao carregar os agendamentos:", error);
-            alert("Ocorreu um erro ao carregar os agendamentos. Tente novamente mais tarde.");
+            alert(`Ocorreu um erro ao carregar os agendamentos: ${error.message}. Tente novamente mais tarde.`);
         }
     }
     </script>

@@ -1,0 +1,120 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #e8f0f2; /* Cor de fundo suave */
+}
+
+h1 {
+    text-align: center;
+    color: #002147; /* Azul marinho */
+}
+
+#agendamentos {
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #003366; /* Azul mais escuro */
+    color: white;
+}
+
+form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Definindo a mesma largura máxima da tabela */
+    margin: 20px auto; /* Centralizando o formulário */
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+select {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 95%; /* Ajustando a largura para 100% */
+}
+
+button {
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #003366; /* Azul escuro */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #002147; /* Azul marinho mais escuro */
+}
+
+/* Adiciona um espaço entre os campos do formulário */
+form input,
+form select {
+    margin-bottom: 15px;
+}
+
+/*Modal*/
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+#modal-confirmacao {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Responsividade */
+@media (max-width: 600px) {
+    #agendamentos, form {
+        padding: 10px;
+        width: 95%; /* Largura responsiva */
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    button {
+        padding: 8px;
+    }
+}

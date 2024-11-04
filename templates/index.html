@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos de Salas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body onload="carregarAgendamentos()">
+    <h1>Agendamentos de Salas</h1>
+    <div id="agendamentos">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Hora Início</th>
+                    <th>Hora Fim</th>
+                    <th>Descrição</th>
+                    <th>Participantes</th>
+                    <th>Sala</th>
+                    <th>Nome</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-agendamentos">
+                <!-- Os dados serão preenchidos aqui -->
+            </tbody>
+        </table>
+    </div>
+    
+    <h1>Agende seu horário abaixo</h1>
+
+    <form id="form-agendamento" method="POST" action="/agendar">
+        <input type="text" name="nome" placeholder="Digite seu nome" required>
+        <input type="text" name="descricao" placeholder="Descrição" required>
+        <input type="text" name="participantes" placeholder="Quantidade de Participantes" required>
+        <input type="date" name="data" placeholder="Data" required>
+        <input type="time" name="hora_inicio" placeholder="Hora Início" required>
+        <input type="time" name="hora_fim" placeholder="Hora Fim" required>
+        <label for="sala">Escolha a Sala:</label>
+        <select name="sala" id="sala" required>
+            <option value="" disabled selected>Selecione a sala</option>
+            <option value="1">Sala 1</option>
+            <option value="2">Sala 2</option>
+            <option value="3">Sala 3</option>
+            <option value="4">Sala 4</option>
+            <option value="5">Sala 5</option>
+        </select>
+        <button type="submit">Agendar</button>
+    </form>
+
+    <script>
+    document.getElementById("form-agendamento").onsubmit = async function(event) {
+        event.preventDefault(); // Impede o envio padrão do formulário
+
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                // Mostra a mensagem de erro se o horário já estiver ocupado
+                alert(result.message);
+            } else {
+                // Mensagem de sucesso
+                alert("Agendamento realizado com sucesso!");
+                location.reload(); // Recarrega a página para mostrar os novos agendamentos
+            }
+        } catch (error) {
+            console.error("Erro ao enviar o agendamento:", error);
+            alert("Ocorreu um erro ao tentar enviar o agendamento. Tente novamente mais tarde.");
+        }
+    };
+
+    async function carregarAgendamentos() {
+        const response = await fetch('/agendamentos');
+        const agendamentos = await response.json();
+
+        const tabela = document.getElementById("tabela-agendamentos");
+        tabela.innerHTML = ""; // Limpa a tabela antes de preencher
+
+        agendamentos.forEach(agendamento => {
+            const row = tabela.insertRow();
+            row.insertCell(0).innerText = agendamento[0]; // ID
+            row.insertCell(1).innerText = agendamento[1]; // Data
+            row.insertCell(2).innerText = agendamento[2]; // Hora Início
+            row.insertCell(3).innerText = agendamento[3]; // Hora Fim
+            row.insertCell(4).innerText = agendamento[4]; // Descrição
+            row.insertCell(5).innerText = agendamento[5]; // Participantes
+            row.insertCell(6).innerText = agendamento[6]; // Sala
+            row.insertCell(7).innerText = agendamento[7]; // Nome
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+/*SELECT * FROM agendamentos*/
+DELETE FROM agendamentos WHERE id = 1

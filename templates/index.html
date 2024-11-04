@@ -69,7 +69,7 @@
             } else {
                 // Mensagem de sucesso
                 alert("Agendamento realizado com sucesso!");
-                location.reload(); // Recarrega a página para mostrar os novos agendamentos
+                carregarAgendamentos(); // Atualiza a tabela de agendamentos
             }
         } catch (error) {
             console.error("Erro ao enviar o agendamento:", error);
@@ -78,23 +78,28 @@
     };
 
     async function carregarAgendamentos() {
-        const response = await fetch('/agendamentos');
-        const agendamentos = await response.json();
+        try {
+            const response = await fetch('/agendamentos');
+            const agendamentos = await response.json();
 
-        const tabela = document.getElementById("tabela-agendamentos");
-        tabela.innerHTML = ""; // Limpa a tabela antes de preencher
+            const tabela = document.getElementById("tabela-agendamentos");
+            tabela.innerHTML = ""; // Limpa a tabela antes de preencher
 
-        agendamentos.forEach(agendamento => {
-            const row = tabela.insertRow();
-            row.insertCell(0).innerText = agendamento[0]; // ID
-            row.insertCell(1).innerText = agendamento[1]; // Data
-            row.insertCell(2).innerText = agendamento[2]; // Hora Início
-            row.insertCell(3).innerText = agendamento[3]; // Hora Fim
-            row.insertCell(4).innerText = agendamento[4]; // Descrição
-            row.insertCell(5).innerText = agendamento[5]; // Participantes
-            row.insertCell(6).innerText = agendamento[6]; // Sala
-            row.insertCell(7).innerText = agendamento[7]; // Nome
-        });
+            agendamentos.forEach(agendamento => {
+                const row = tabela.insertRow();
+                row.insertCell(0).innerText = agendamento[0]; // ID
+                row.insertCell(1).innerText = agendamento[1]; // Data
+                row.insertCell(2).innerText = agendamento[2]; // Hora Início
+                row.insertCell(3).innerText = agendamento[3]; // Hora Fim
+                row.insertCell(4).innerText = agendamento[4]; // Descrição
+                row.insertCell(5).innerText = agendamento[5]; // Participantes
+                row.insertCell(6).innerText = agendamento[6]; // Sala
+                row.insertCell(7).innerText = agendamento[7]; // Nome
+            });
+        } catch (error) {
+            console.error("Erro ao carregar os agendamentos:", error);
+            alert("Ocorreu um erro ao carregar os agendamentos. Tente novamente mais tarde.");
+        }
     }
     </script>
 </body>

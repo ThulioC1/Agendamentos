@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
+import os
 from datetime import datetime
 
 app = Flask(__name__)
@@ -106,4 +107,6 @@ def listar_agendamentos():
     return jsonify(agendamentos_formatados)
 
 if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 8080))  # 5000 é a porta padrão para desenvolvimento
+    app.run(host="0.0.0.0", port=port)
     app.run(debug=True)
